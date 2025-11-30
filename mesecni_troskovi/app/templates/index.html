@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mesečni Troškovi</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>📊 Mesečni Troškovi</h1>
+                <p>Pratite i analizirajte svoje rashode</p>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- Sidebar - Person Info -->
+            <aside class="sidebar">
+                <div class="person-section">
+                    <h2>Lični Podaci</h2>
+                    
+                    <form id="personForm" class="form-group">
+                        <div class="input-group">
+                            <input type="text" id="ime" placeholder="Ime" required>
+                        </div>
+                        <div class="input-group">
+                            <input type="text" id="prezime" placeholder="Prezime" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Datum Rođenja</label>
+                            <input type="date" id="datum_rodjenja" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Profilna Slika</label>
+                            <input type="file" id="slika" accept="image/*">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Sačuvaj Podatke</button>
+                    </form>
+
+                    <div id="personImage" class="person-image-container" style="display:none;">
+                        <img id="displayImage" alt="Profilna slika">
+                    </div>
+                </div>
+
+                <div class="month-selector">
+                    <h2>Mesec</h2>
+                    <input type="month" id="selectedMonth" required>
+                    <button onclick="loadMonthData()" class="btn btn-secondary">Učitaj Mesec</button>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="content">
+                <!-- Summary Cards -->
+                <div class="summary-cards">
+                    <div class="card card-income">
+                        <h3>Prihodi</h3>
+                        <p class="amount" id="totalPrihodi">0.00 дин</p>
+                    </div>
+                    <div class="card card-expense">
+                        <h3>Troškovi</h3>
+                        <p class="amount" id="totalTroskovi">0.00 дин</p>
+                    </div>
+                    <div class="card card-balance">
+                        <h3>Razlika</h3>
+                        <p class="amount" id="totalRazlika">0.00 дин</p>
+                    </div>
+                </div>
+
+                <!-- Tabs -->
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab('prihodi')">💰 Prihodi</button>
+                    <button class="tab-btn" onclick="switchTab('troskovi')">💸 Troškovi</button>
+                    <button class="tab-btn" onclick="switchTab('izvestaj')">📈 Izveštaj</button>
+                </div>
+
+                <!-- Prihodi Tab -->
+                <div id="prihodi-tab" class="tab-content active">
+                    <div class="section">
+                        <h2>Dodaj Prihod</h2>
+                        <form id="prihodForm" class="form-group">
+                            <div class="input-group">
+                                <input type="text" id="prihodNaziv" placeholder="Naziv (pl. Plata)" required>
+                            </div>
+                            <div class="input-group">
+                                <input type="number" id="prihodIznos" placeholder="Iznos" step="0.01" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Dodaj Prihod</button>
+                        </form>
+                    </div>
+
+                    <div class="section">
+                        <h2>Lista Prihoda</h2>
+                        <div id="prihodList" class="list-container">
+                            <p class="empty-state">Nema prihoda za ovaj mesec</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Troškovi Tab -->
+                <div id="troskovi-tab" class="tab-content">
+                    <div class="section">
+                        <h2>Dodaj Trosak</h2>
+                        <form id="trosakForm" class="form-group">
+                            <div class="input-group">
+                                <label>Kategorija</label>
+                                <select id="kategorija" required>
+                                    <option value="">Izaberite kategoriju</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <input type="text" id="trosakNaziv" placeholder="Naziv troška" required>
+                            </div>
+                            <div class="input-group">
+                                <input type="number" id="trosakIznos" placeholder="Iznos" step="0.01" required>
+                            </div>
+                            <div class="input-group">
+                                <textarea id="trosakOpis" placeholder="Opis (opciono)"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Dodaj Trosak</button>
+                        </form>
+                    </div>
+
+                    <div class="section">
+                        <h2>Nova Kategorija</h2>
+                        <form id="kategorijaForm" class="form-group">
+                            <div class="input-group">
+                                <input type="text" id="kategorijaNaziv" placeholder="Naziv kategorije">
+                            </div>
+                            <div class="input-group">
+                                <label>Boja</label>
+                                <input type="color" id="kategorijaBojaInput" value="#3498db">
+                            </div>
+                            <button type="submit" class="btn btn-secondary">Kreiraj Kategoriju</button>
+                        </form>
+                    </div>
+
+                    <div class="section">
+                        <h2>Lista Troškova</h2>
+                        <div id="trosakList" class="list-container">
+                            <p class="empty-state">Nema troškova za ovaj mesec</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Izveštaj Tab -->
+                <div id="izvestaj-tab" class="tab-content">
+                    <div class="section">
+                        <h2>Analiza Troškova</h2>
+                        <div class="chart-container">
+                            <canvas id="trosakiChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h2>Detaljni Pregled</h2>
+                        <table id="izvestajTabela" class="report-table">
+                            <thead>
+                                <tr>
+                                    <th>Kategorija</th>
+                                    <th>Iznos (дин)</th>
+                                    <th>Procentualno</th>
+                                </tr>
+                            </thead>
+                            <tbody id="izvestajBody">
+                                <tr>
+                                    <td colspan="3" class="empty-state">Učitajte mesec za pregled</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="section">
+                        <button onclick="exportPDF()" class="btn btn-success">📥 Preuzmi PDF Izveštaj</button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
