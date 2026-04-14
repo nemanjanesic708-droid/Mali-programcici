@@ -12,6 +12,7 @@ export async function maybeRunAutomaticReminderCheckForUser(userId: string) {
       lastName: true,
       email: true,
       plan: true,
+      role: true,
       verified: true,
       isPremium: true,
       wantsEmailReminders: true,
@@ -41,6 +42,7 @@ export async function maybeRunAutomaticReminderCheckForUser(userId: string) {
     {
       ...user,
       plan: user.plan === "pro" || user.isPremium ? "pro" : "free",
+      role: user.role === "admin" ? "admin" : "user",
       verified: user.plan === "pro" || user.isPremium,
       isPremium: user.plan === "pro" || user.isPremium
     },

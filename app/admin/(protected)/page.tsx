@@ -1,5 +1,6 @@
 import { logoutAdminAction, requireAdminSession } from "@/lib/admin-auth";
 import { getAdminDashboardMetrics } from "@/lib/admin";
+import { AdminDashboardTables } from "@/app/components/admin-dashboard-tables";
 import { FormSubmitButton } from "@/app/components/form-submit-button";
 
 export const dynamic = "force-dynamic";
@@ -49,6 +50,8 @@ export default async function AdminDashboardPage() {
           </div>
         </div>
       </section>
+
+      <AdminDashboardTables />
     </div>
   );
 }
