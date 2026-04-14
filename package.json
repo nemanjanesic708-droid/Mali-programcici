@@ -1,0 +1,31 @@
+{
+  "name": "warranty-tracker",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "predev": "prisma db push",
+    "prebuild": "prisma db push",
+    "build": "next build",
+    "start": "next start",
+    "postinstall": "prisma generate",
+    "db:push": "prisma db push",
+    "db:generate": "prisma generate"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.17.0",
+    "date-fns": "^3.6.0",
+    "next": "^14.2.5",
+    "nodemailer": "^8.0.5",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "@types/nodemailer": "^8.0.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "prisma": "^5.17.0",
+    "typescript": "^5.5.3"
+  }
+}

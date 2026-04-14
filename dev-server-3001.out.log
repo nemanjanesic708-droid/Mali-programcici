@@ -1,0 +1,47 @@
+
+> warranty-tracker@0.1.0 predev
+> prisma db push
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+Datasource "db": SQLite database "dev.db" at "file:./dev.db"
+
+The database is already in sync with the Prisma schema.
+
+Running generate... (Use --skip-generate to skip the generators)
+[2K[1A[2K[GRunning generate... - Prisma Client
+[2K[1A[2K[G✔ Generated Prisma Client (v5.22.0) to .\node_modules\@prisma\client in 76ms
+
+
+> warranty-tracker@0.1.0 dev
+> next dev --port 3001
+
+  ▲ Next.js 14.2.35
+  - Local:        http://localhost:3001
+  - Environments: .env
+
+ ✓ Starting...
+ ✓ Ready in 3.3s
+ ○ Compiling /profile ...
+ ✓ Compiled /profile in 4.4s (591 modules)
+ GET /profile 200 in 4821ms
+ GET /profile 200 in 39ms
+ ○ Compiling /pro/[feature] ...
+ ✓ Compiled /pro/[feature] in 594ms (586 modules)
+ ✓ Compiled / in 383ms (591 modules)
+ ○ Compiling /items/new ...
+ ✓ Compiled /items/new in 684ms (674 modules)
+ ○ Compiling /items/[id] ...
+ ✓ Compiled /items/[id] in 524ms (681 modules)
+ ✓ Compiled /items/[id]/edit in 366ms (683 modules)
+ ✓ Compiled in 446ms (387 modules)
+ ✓ Compiled in 432ms (387 modules)
+ ✓ Compiled in 320ms (387 modules)
+ ✓ Compiled in 453ms (678 modules)
+ ✓ Compiled in 530ms (692 modules)
+ ✓ Compiled in 338ms (678 modules)
+ GET /items/new 200 in 132ms
+ GET /profile 200 in 67ms
+ GET / 200 in 45ms
+Terminate batch job (Y/N)? [?25h
+

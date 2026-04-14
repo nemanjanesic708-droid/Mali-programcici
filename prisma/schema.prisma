@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id               String   @id @default(cuid())
+  name             String
+  retailer         String
+  priceCents       Int
+  priceAmount      Decimal?
+  priceCurrency    String   @default("EUR")
+  purchaseDate     DateTime
+  warrantyMonths   Int
+  expiryDate       DateTime
+  notes            String?
+  receiptImagePath String?
+  productImage     String?
+  productImageUrl  String?
+  reminderEnabled  Boolean  @default(false)
+  reminderDaysBefore Int?
+  lastReminderSentAt DateTime?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([expiryDate])
+  @@index([createdAt])
+}
+
+model UserProfile {
+  id                   String   @id
+  fullName             String
+  email                String?
+  verified             Boolean  @default(false)
+  isPremium            Boolean  @default(false)
+  wantsEmailReminders  Boolean  @default(false)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+}
+
+model LaunchInterest {
+  id        String   @id @default(cuid())
+  email     String
+  feature   String
+  createdAt DateTime @default(now())
+
+  @@unique([email, feature])
+}
+
+model AnalyticsEvent {
+  id        String   @id @default(cuid())
+  name      String
+  entityId  String?
+  source    String?
+  feature   String?
+  email     String?
+  payload   String?
+  createdAt DateTime @default(now())
+
+  @@index([name, createdAt])
+}
