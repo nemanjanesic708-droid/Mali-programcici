@@ -2,16 +2,102 @@
   --bg: #f5f6f5;
   --surface: #ffffff;
   --surface-soft: #f7f9f8;
+  --surface-strong: #eef2ef;
   --text: #171a18;
   --muted: #68706b;
   --border: #dfe4e0;
   --accent: #1f6d53;
+  --accent-strong: #17513d;
+  --accent-contrast: #f6fbf8;
   --accent-soft: #edf6f1;
   --danger: #b14d37;
+  --danger-soft: #fff3ef;
   --warn: #a77719;
+  --warn-soft: #fff4de;
+  --success-soft: #eef8f2;
+  --success-text: #164e3a;
+  --danger-text: #7b321f;
+  --placeholder-bg: #e6eeea;
+  --placeholder-text: #285241;
+  --overlay: rgba(12, 14, 13, 0.82);
+  --sidebar-bg: rgba(255, 255, 255, 0.94);
+  --button-ghost-hover: #f1f4f2;
+  --field-bg: #ffffff;
+  --field-placeholder: #8c948f;
+  --focus-ring: rgba(31, 109, 83, 0.22);
+  --accent-border-soft: rgba(31, 109, 83, 0.12);
+  --overlay-chip-bg: rgba(23, 26, 24, 0.68);
+  --overlay-chip-text: #ffffff;
+  --lightbox-close-border: rgba(255, 255, 255, 0.16);
+  --lightbox-close-bg: rgba(255, 255, 255, 0.08);
+  --lightbox-close-text: #ffffff;
+  --danger-border-soft: rgba(177, 77, 55, 0.18);
+  --danger-border-strong: rgba(177, 77, 55, 0.32);
+  --notice-danger-border: rgba(177, 77, 55, 0.22);
+  --notice-success-border: rgba(31, 109, 83, 0.18);
   --shadow: 0 10px 28px rgba(20, 24, 21, 0.05);
+  --shadow-strong: 0 18px 36px rgba(20, 24, 21, 0.12);
+  --status-active-bg: #e9f5ef;
+  --status-active-text: #1a5e45;
+  --status-reminder-bg: #edf6f1;
+  --status-reminder-text: #1f6d53;
+  --status-expired-bg: #fdeee8;
+  --status-expired-text: #b14d37;
+  --status-expiring-bg: #fff4de;
+  --status-expiring-text: #a77719;
   --radius: 8px;
   --sidebar-width: 240px;
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --bg: #0f1311;
+  --surface: #151b18;
+  --surface-soft: #1a221e;
+  --surface-strong: #212b25;
+  --text: #edf2ee;
+  --muted: #a6b0aa;
+  --border: #2b3530;
+  --accent: #46a17d;
+  --accent-strong: #5ab88f;
+  --accent-contrast: #08130e;
+  --accent-soft: rgba(70, 161, 125, 0.14);
+  --danger: #df8e7a;
+  --danger-soft: rgba(183, 89, 67, 0.16);
+  --warn: #d7ae56;
+  --warn-soft: rgba(167, 119, 25, 0.16);
+  --success-soft: rgba(70, 161, 125, 0.14);
+  --success-text: #87d7b2;
+  --danger-text: #f1b3a3;
+  --placeholder-bg: #202925;
+  --placeholder-text: #8ebaa5;
+  --overlay: rgba(3, 5, 4, 0.88);
+  --sidebar-bg: rgba(15, 19, 17, 0.9);
+  --button-ghost-hover: #202925;
+  --field-bg: #121815;
+  --field-placeholder: #6d7771;
+  --focus-ring: rgba(70, 161, 125, 0.32);
+  --accent-border-soft: rgba(70, 161, 125, 0.24);
+  --overlay-chip-bg: rgba(6, 9, 8, 0.72);
+  --overlay-chip-text: #f3f7f4;
+  --lightbox-close-border: rgba(255, 255, 255, 0.12);
+  --lightbox-close-bg: rgba(255, 255, 255, 0.06);
+  --lightbox-close-text: #f3f7f4;
+  --danger-border-soft: rgba(177, 77, 55, 0.22);
+  --danger-border-strong: rgba(177, 77, 55, 0.34);
+  --notice-danger-border: rgba(177, 77, 55, 0.24);
+  --notice-success-border: rgba(70, 161, 125, 0.24);
+  --shadow: 0 12px 30px rgba(0, 0, 0, 0.22);
+  --shadow-strong: 0 22px 54px rgba(0, 0, 0, 0.38);
+  --status-active-bg: rgba(70, 161, 125, 0.16);
+  --status-active-text: #8ad8b4;
+  --status-reminder-bg: rgba(70, 161, 125, 0.14);
+  --status-reminder-text: #7ecda8;
+  --status-expired-bg: rgba(177, 77, 55, 0.18);
+  --status-expired-text: #f0b0a0;
+  --status-expiring-bg: rgba(167, 119, 25, 0.2);
+  --status-expiring-text: #e3bf6f;
+  color-scheme: dark;
 }
 
 * {
@@ -28,6 +114,7 @@ body {
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background: var(--bg);
   color: var(--text);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 code {
@@ -56,7 +143,7 @@ textarea {
 
 .sidebar {
   border-bottom: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.94);
+  background: var(--sidebar-bg);
   backdrop-filter: blur(10px);
 }
 
@@ -68,6 +155,13 @@ textarea {
 
 .sidebar-brand {
   margin-bottom: 14px;
+}
+
+.shell-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .brand-mark {
@@ -109,7 +203,7 @@ textarea {
 
 .sidebar-link-active {
   background: var(--accent-soft);
-  border-color: rgba(31, 109, 83, 0.12);
+  border-color: var(--accent-border-soft);
   color: var(--accent);
 }
 
@@ -322,8 +416,8 @@ textarea {
   height: 100%;
   display: grid;
   place-items: center;
-  background: #e6eeea;
-  color: #285241;
+  background: var(--placeholder-bg);
+  color: var(--placeholder-text);
   font-size: 0.98rem;
   font-weight: 700;
 }
@@ -405,23 +499,23 @@ textarea {
 }
 
 .status-active {
-  background: #e9f5ef;
-  color: #1a5e45;
+  background: var(--status-active-bg);
+  color: var(--status-active-text);
 }
 
 .status-expiringSoon {
-  background: #fff4de;
-  color: var(--warn);
+  background: var(--status-expiring-bg);
+  color: var(--status-expiring-text);
 }
 
 .status-expired {
-  background: #fdeee8;
-  color: var(--danger);
+  background: var(--status-expired-bg);
+  color: var(--status-expired-text);
 }
 
 .status-reminder {
-  background: #edf6f1;
-  color: var(--accent);
+  background: var(--status-reminder-bg);
+  color: var(--status-reminder-text);
 }
 
 .lightbox-trigger {
@@ -444,8 +538,8 @@ textarea {
   display: inline-flex;
   align-items: center;
   border-radius: 999px;
-  background: rgba(23, 26, 24, 0.68);
-  color: #fff;
+  background: var(--overlay-chip-bg);
+  color: var(--overlay-chip-text);
   font-size: 0.76rem;
   font-weight: 600;
   opacity: 0;
@@ -459,7 +553,7 @@ textarea {
 }
 
 .lightbox-trigger:focus-visible {
-  outline: 2px solid rgba(31, 109, 83, 0.3);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
@@ -470,7 +564,7 @@ textarea {
   display: grid;
   place-items: center;
   padding: 20px;
-  background: rgba(12, 14, 13, 0.82);
+  background: var(--overlay);
 }
 
 .lightbox-dialog {
@@ -484,7 +578,7 @@ textarea {
   max-width: 100%;
   max-height: calc(100vh - 96px);
   border-radius: 8px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+  box-shadow: var(--shadow-strong);
   object-fit: contain;
 }
 
@@ -494,12 +588,34 @@ textarea {
   right: 18px;
   min-height: 40px;
   padding: 0 14px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 1px solid var(--lightbox-close-border);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
+  background: var(--lightbox-close-bg);
+  color: var(--lightbox-close-text);
   font-weight: 600;
   cursor: pointer;
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.16s ease, border-color 0.16s ease, color 0.16s ease, transform 0.16s ease;
+}
+
+.theme-toggle-icon {
+  font-size: 0.95rem;
+  line-height: 1;
 }
 
 .button {
@@ -515,11 +631,12 @@ textarea {
   color: var(--text);
   font-weight: 600;
   cursor: pointer;
+  transition: background-color 0.16s ease, border-color 0.16s ease, color 0.16s ease, transform 0.16s ease;
 }
 
 .button-primary {
   background: var(--accent);
-  color: #fff;
+  color: var(--accent-contrast);
 }
 
 .button-ghost {
@@ -528,9 +645,9 @@ textarea {
 }
 
 .button-danger {
-  background: #fff3ef;
+  background: var(--danger-soft);
   color: var(--danger);
-  border-color: rgba(177, 77, 55, 0.18);
+  border-color: var(--danger-border-soft);
 }
 
 .button-full {
@@ -606,7 +723,7 @@ textarea {
   overflow: hidden;
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  background: #fff;
+  background: var(--surface);
   aspect-ratio: 4 / 3;
 }
 
@@ -646,8 +763,14 @@ textarea {
   padding: 11px 13px;
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  background: #fff;
+  background: var(--field-bg);
   color: var(--text);
+  transition: background-color 0.16s ease, border-color 0.16s ease, color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.field input::placeholder,
+.field textarea::placeholder {
+  color: var(--field-placeholder);
 }
 
 .field textarea {
@@ -658,8 +781,8 @@ textarea {
 .field input:focus,
 .field select:focus,
 .field textarea:focus {
-  outline: 2px solid rgba(31, 109, 83, 0.12);
-  border-color: rgba(31, 109, 83, 0.35);
+  outline: 2px solid var(--focus-ring);
+  border-color: var(--accent);
 }
 
 .field-error {
@@ -820,15 +943,15 @@ textarea {
 }
 
 .notice-error {
-  border-color: rgba(177, 77, 55, 0.22);
-  background: #fff3ef;
-  color: #7b321f;
+  border-color: var(--notice-danger-border);
+  background: var(--danger-soft);
+  color: var(--danger-text);
 }
 
 .notice-success {
-  border-color: rgba(31, 109, 83, 0.18);
-  background: #eef8f2;
-  color: #164e3a;
+  border-color: var(--notice-success-border);
+  background: var(--success-soft);
+  color: var(--success-text);
 }
 
 .panel-subtle {
@@ -845,6 +968,75 @@ textarea {
   color: var(--muted);
   font-weight: 600;
   font-size: 0.92rem;
+}
+
+.theme-toggle:hover,
+.button:hover,
+.sidebar-link:hover,
+.inline-link:hover,
+.back-link:hover,
+.ocr-upgrade-link:hover,
+.list-row-action:hover {
+  filter: none;
+}
+
+.theme-toggle:hover,
+.button-ghost:hover,
+.lightbox-close:hover {
+  background: var(--button-ghost-hover);
+}
+
+.button-primary:hover {
+  background: var(--accent-strong);
+}
+
+.button-danger:hover {
+  border-color: var(--danger-border-strong);
+}
+
+.button:active,
+.theme-toggle:active {
+  transform: translateY(1px);
+}
+
+.button:focus-visible,
+.theme-toggle:focus-visible,
+.sidebar-link:focus-visible,
+.lightbox-close:focus-visible,
+.lightbox-trigger:focus-visible,
+.inline-link:focus-visible,
+.back-link:focus-visible,
+.ocr-upgrade-link:focus-visible,
+.list-row-link:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.button:disabled,
+.theme-toggle:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.list-row-card:hover,
+.panel:hover,
+.detail-panel:hover,
+.form-panel:hover,
+.mini-stat:hover,
+.pro-hint-card:hover,
+.auth-card:hover {
+  box-shadow: var(--shadow);
+}
+
+.list-row-link:hover .list-row-action,
+.list-row-link:focus-visible .list-row-action,
+.inline-link,
+.ocr-upgrade-link,
+.list-row-action {
+  color: var(--accent);
 }
 
 @media (max-width: 719px) {
