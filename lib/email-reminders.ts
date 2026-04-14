@@ -3,7 +3,7 @@ import path from "path";
 import { randomUUID } from "crypto";
 import { differenceInCalendarDays, format } from "date-fns";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/current-user";
+import { getCurrentUser, type CurrentUser } from "@/lib/current-user";
 import { getReminderInfo } from "@/lib/date";
 import { sendEmail } from "@/lib/mail";
 
@@ -54,7 +54,7 @@ async function sendReminderEmail(input: {
     `Datum isteka garancije: ${formatExpiryDate(input.expiryDate)}`,
     `Preostalo dana: ${input.daysUntilExpiry}`,
     "",
-    "Proveri racun i detalje proizvoda u aplikaciji Warranty Tracker."
+    "Proveri racun i detalje proizvoda u aplikaciji Garancija +."
   ].join("\n");
 
   const mailResult = await sendEmail(input.email, subject, text);
@@ -84,6 +84,21 @@ async function sendReminderEmail(input: {
 export async function runEmailReminderCheck(source: string): Promise<ReminderDispatchResult> {
   const user = await getCurrentUser();
 
+  if (!user) {
+    return {
+      checked: 0,
+      eligible: 0,
+      sent: 0,
+      skipped: 0,
+      mode: "disabled",
+      outboxFiles: []
+    };
+  }
+
+  return runEmailReminderCheckForUser(user, source);
+}
+
+async function dispatchForUser(user: CurrentUser, source: string): Promise<ReminderDispatchResult> {
   if (!user.wantsEmailReminders || !user.email) {
     console.info("[Warranty Tracker] Email reminders disabled for current user", {
       source,
@@ -104,7 +119,8 @@ export async function runEmailReminderCheck(source: string): Promise<ReminderDis
   const now = new Date();
   const products = await prisma.product.findMany({
     where: {
-      reminderEnabled: true
+      reminderEnabled: true,
+      userId: user.id
     },
     orderBy: {
       expiryDate: "asc"
@@ -182,4 +198,59 @@ export async function runEmailReminderCheck(source: string): Promise<ReminderDis
     mode,
     outboxFiles
   };
+}
+
+export async function runEmailReminderCheckForUser(user: CurrentUser, source: string) {
+  return dispatchForUser(user, source);
+}
+
+export async function runGlobalEmailReminderCheck(source: string): Promise<ReminderDispatchResult> {
+  const users = await prisma.userProfile.findMany({
+    where: {
+      email: {
+        not: null
+      },
+      wantsEmailReminders: true
+    },
+    select: {
+      id: true,
+      fullName: true,
+      firstName: true,
+      lastName: true,
+      email: true,
+      plan: true,
+      verified: true,
+      isPremium: true,
+      wantsEmailReminders: true
+    }
+  });
+
+  const aggregate: ReminderDispatchResult = {
+    checked: 0,
+    eligible: 0,
+    sent: 0,
+    skipped: 0,
+    mode: process.env.EMAIL_USER && process.env.EMAIL_PASS ? "gmail" : "outbox",
+    outboxFiles: []
+  };
+
+  for (const user of users) {
+    const result = await dispatchForUser(
+      {
+        ...user,
+        plan: user.plan === "pro" || user.isPremium ? "pro" : "free",
+        verified: user.plan === "pro" || user.isPremium,
+        isPremium: user.plan === "pro" || user.isPremium
+      },
+      source
+    );
+    aggregate.checked += result.checked;
+    aggregate.eligible += result.eligible;
+    aggregate.sent += result.sent;
+    aggregate.skipped += result.skipped;
+    aggregate.outboxFiles.push(...result.outboxFiles);
+    aggregate.mode = result.mode === "disabled" ? aggregate.mode : result.mode;
+  }
+
+  return aggregate;
 }

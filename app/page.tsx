@@ -1,10 +1,14 @@
 import { getDashboardItems } from "@/lib/items";
+import { requireCurrentUser } from "@/lib/current-user";
+import { maybeRunAutomaticReminderCheckForUser } from "@/lib/automatic-reminders";
 import { ProductCard } from "@/app/components/product-card";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const items = await getDashboardItems();
+  const user = await requireCurrentUser();
+  await maybeRunAutomaticReminderCheckForUser(user.id);
+  const items = await getDashboardItems(user.id);
   const reminderItems = items.filter((item) => item.reminderActive);
 
   return (

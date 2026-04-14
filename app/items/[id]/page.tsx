@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { deleteItemAction } from "@/lib/actions";
-import { getCurrentUser } from "@/lib/current-user";
+import { requireCurrentUser } from "@/lib/current-user";
+import { maybeRunAutomaticReminderCheckForUser } from "@/lib/automatic-reminders";
 import { formatDisplayDate } from "@/lib/date";
 import { formatMoney } from "@/lib/format";
 import { getItemById } from "@/lib/items";
@@ -13,8 +14,9 @@ import { LightboxImage } from "@/app/components/lightbox-image";
 export const dynamic = "force-dynamic";
 
 export default async function ItemDetailPage({ params }: { params: { id: string } }) {
-  const item = await getItemById(params.id);
-  const user = await getCurrentUser();
+  const user = await requireCurrentUser();
+  await maybeRunAutomaticReminderCheckForUser(user.id);
+  const item = await getItemById(params.id, user.id);
 
   if (!item) {
     notFound();
@@ -152,13 +154,13 @@ export default async function ItemDetailPage({ params }: { params: { id: string 
           <div>
             <h2 className="panel-title">Pro funkcije</h2>
             <p className="muted-copy">
-              {user.isPremium
+              {user.plan === "pro"
                 ? "Premium funkcije su dostupne na ovom nalogu."
                 : "Premium opcije su zakljucane dok premium paket nije aktivan."}
             </p>
           </div>
           <div className="compact-pro-list">
-            <LockedFeatureCard feature="smart-ocr" source="item_detail" isPremium={user.isPremium} />
+            <LockedFeatureCard feature="smart-ocr" source="item_detail" isPremium={user.plan === "pro"} />
           </div>
         </div>
       </section>

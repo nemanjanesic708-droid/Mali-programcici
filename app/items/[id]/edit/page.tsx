@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
 import { updateItemAction } from "@/lib/actions";
+import { requireCurrentUser } from "@/lib/current-user";
+import { maybeRunAutomaticReminderCheckForUser } from "@/lib/automatic-reminders";
 import { formatDateInput } from "@/lib/date";
 import { formatPriceInput } from "@/lib/format";
 import { getItemById } from "@/lib/items";
@@ -14,7 +16,9 @@ export default async function EditItemPage({
   params: { id: string };
   searchParams?: { error?: string };
 }) {
-  const item = await getItemById(params.id);
+  const user = await requireCurrentUser();
+  await maybeRunAutomaticReminderCheckForUser(user.id);
+  const item = await getItemById(params.id, user.id);
 
   if (!item) {
     notFound();

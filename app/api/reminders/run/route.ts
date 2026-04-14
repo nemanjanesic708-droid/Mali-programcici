@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { runEmailReminderCheck } from "@/lib/email-reminders";
+import { runGlobalEmailReminderCheck } from "@/lib/email-reminders";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +19,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const result = await runEmailReminderCheck("api");
+  const result = await runGlobalEmailReminderCheck("api");
   return NextResponse.json(result);
 }

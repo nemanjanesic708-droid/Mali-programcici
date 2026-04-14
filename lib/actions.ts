@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { trackEvent } from "@/lib/analytics";
 import { calculateExpiryDate, parseDateInput } from "@/lib/date";
-import { getCurrentUser } from "@/lib/current-user";
+import { requireCurrentUser } from "@/lib/current-user";
 import { runEmailReminderCheck } from "@/lib/email-reminders";
 import {
   deleteProductImageFile,
@@ -208,6 +208,7 @@ function parseItemFormData(formData: FormData): ParsedItemPayload {
 }
 
 export async function createItemAction(formData: FormData) {
+  const user = await requireCurrentUser();
   const returnTo = readTextField(formData, "returnTo") || "/items/new";
 
   let payload: ParsedItemPayload;
@@ -215,6 +216,18 @@ export async function createItemAction(formData: FormData) {
     payload = parseItemFormData(formData);
   } catch (error) {
     redirectWithError(returnTo, error instanceof Error ? error.message : "Cuvanje nije uspelo.");
+  }
+
+  if (user.plan === "free") {
+    const productCount = await prisma.product.count({
+      where: {
+        userId: user.id
+      }
+    });
+
+    if (productCount >= 3) {
+      redirectWithError(returnTo, "Free paket podrzava najvise 3 uredjaja. Nadogradi na Pro za neogranicen broj.");
+    }
   }
 
   const receiptImagePath = payload.receiptFile ? await saveReceiptUpload(payload.receiptFile) : null;
@@ -231,6 +244,7 @@ export async function createItemAction(formData: FormData) {
 
   const item = await prisma.product.create({
     data: {
+      userId: user.id,
       name: payload.name,
       retailer: payload.retailer,
       priceAmount: payload.priceAmount,
@@ -259,12 +273,13 @@ export async function createItemAction(formData: FormData) {
 }
 
 export async function updateItemAction(itemId: string, formData: FormData) {
+  const user = await requireCurrentUser();
   const returnTo = readTextField(formData, "returnTo") || `/items/${itemId}/edit`;
   const existingItem = await prisma.product.findUnique({
     where: { id: itemId }
   });
 
-  if (!existingItem) {
+  if (!existingItem || existingItem.userId !== user.id) {
     redirect("/");
   }
 
@@ -341,13 +356,25 @@ export async function updateItemAction(itemId: string, formData: FormData) {
 
 export async function updateProfileAction(formData: FormData) {
   const returnTo = "/profile";
-  const user = await getCurrentUser();
+  const user = await requireCurrentUser();
   const emailValue = readTextField(formData, "email").toLowerCase();
   const wantsEmailReminders = formData.get("wantsEmailReminders") === "on";
   const email = emailValue || null;
 
   if (wantsEmailReminders && (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))) {
     redirectWithError(returnTo, "Unesi ispravnu email adresu da bi email podsetnici radili.");
+  }
+
+  if (email && email !== user.email) {
+    const existingUser = await prisma.userProfile.findFirst({
+      where: {
+        email
+      }
+    });
+
+    if (existingUser && existingUser.id !== user.id) {
+      redirectWithError(returnTo, "Ova email adresa je vec zauzeta.");
+    }
   }
 
   await prisma.userProfile.update({
@@ -377,11 +404,12 @@ export async function triggerReminderCheckAction() {
 }
 
 export async function deleteItemAction(itemId: string) {
+  const user = await requireCurrentUser();
   const existingItem = await prisma.product.findUnique({
     where: { id: itemId }
   });
 
-  if (!existingItem) {
+  if (!existingItem || existingItem.userId !== user.id) {
     redirect("/");
   }
 

@@ -1,9 +1,16 @@
 import { NextResponse } from "next/server";
+import { getCurrentUser } from "@/lib/current-user";
 import { sendEmail } from "@/lib/mail";
 
 export const dynamic = "force-dynamic";
 
 export async function POST() {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+  }
+
   const emailUser = process.env.EMAIL_USER;
 
   if (!emailUser) {

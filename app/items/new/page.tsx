@@ -1,5 +1,6 @@
 import { createItemAction } from "@/lib/actions";
-import { getCurrentUser } from "@/lib/current-user";
+import { requireCurrentUser } from "@/lib/current-user";
+import { maybeRunAutomaticReminderCheckForUser } from "@/lib/automatic-reminders";
 import { formatDateInput } from "@/lib/date";
 import { ItemForm } from "@/app/components/item-form";
 
@@ -16,7 +17,8 @@ async function NewItemPageContent({
 }: {
   searchParams?: { error?: string };
 }) {
-  const user = await getCurrentUser();
+  const user = await requireCurrentUser();
+  await maybeRunAutomaticReminderCheckForUser(user.id);
 
   return (
     <ItemForm
@@ -25,7 +27,7 @@ async function NewItemPageContent({
       submitLabel="Sacuvaj"
       pendingLabel="Cuvanje..."
       action={createItemAction}
-      isPremium={user.isPremium}
+      isPremium={user.plan === "pro"}
       enableSmartScan
       returnTo="/items/new"
       errorMessage={searchParams?.error}

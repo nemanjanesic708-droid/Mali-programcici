@@ -1,20 +1,22 @@
 import { getDashboardItems } from "@/lib/items";
 import { formatDisplayDate } from "@/lib/date";
-import { triggerReminderCheckAction, updateProfileAction } from "@/lib/actions";
+import { updateProfileAction } from "@/lib/actions";
 import { LockedFeatureCard } from "@/app/components/locked-feature-card";
-import { getCurrentUser } from "@/lib/current-user";
+import { requireCurrentUser } from "@/lib/current-user";
+import { maybeRunAutomaticReminderCheckForUser } from "@/lib/automatic-reminders";
 import { FormSubmitButton } from "@/app/components/form-submit-button";
-import { TestEmailButton } from "@/app/components/test-email-button";
+import { LogoutForm } from "@/app/components/logout-form";
 
 export const dynamic = "force-dynamic";
 
 export default async function ProfilePage({
   searchParams
 }: {
-  searchParams?: { saved?: string; error?: string; reminderRun?: string; sent?: string; eligible?: string; mode?: string };
+  searchParams?: { saved?: string; error?: string };
 }) {
-  const items = await getDashboardItems();
-  const user = await getCurrentUser();
+  const user = await requireCurrentUser();
+  await maybeRunAutomaticReminderCheckForUser(user.id);
+  const items = await getDashboardItems(user.id);
   const reminderItems = items.filter((item) => item.reminderActive);
   const emailedItems = items.filter((item) => item.lastReminderSentAt);
 
@@ -36,19 +38,17 @@ export default async function ProfilePage({
     <div className="page-stack">
       {searchParams?.error ? <div className="notice notice-error">{searchParams.error}</div> : null}
       {searchParams?.saved === "profile" ? <div className="notice notice-success">Profil je sacuvan.</div> : null}
-      {searchParams?.reminderRun ? (
-        <div className="notice notice-success">
-          Provera zavrsena. Poslato: {searchParams.sent ?? "0"} / kandidata: {searchParams.eligible ?? "0"} ({searchParams.mode ?? "n/a"}).
-        </div>
-      ) : null}
 
       <section className="panel">
         <div className="panel-head">
           <div>
             <h1 className="section-title">{user.fullName}</h1>
-            <p className="section-copy">{user.isPremium ? "Premium korisnik" : "Free paket"}</p>
+            <p className="section-copy">{user.plan === "pro" ? "Pro paket" : "Free paket"}</p>
           </div>
-          {user.verified ? <span className="status-pill status-active">Verified</span> : null}
+          <div className="stack" style={{ justifyItems: "end" }}>
+            {user.plan === "pro" ? <span className="status-pill status-active">Verified</span> : null}
+            <LogoutForm />
+          </div>
         </div>
       </section>
 
@@ -57,6 +57,7 @@ export default async function ProfilePage({
           <div>
             <h2 className="panel-title">Email podsetnici</h2>
             <p className="muted-copy">Unesi email adresu i ukljuci slanje podsetnika kada proizvod udje u reminder period.</p>
+            <p className="muted-copy">Provera se pokrece automatski za tvoj nalog najvise jednom na 30 dana.</p>
           </div>
 
           <form action={updateProfileAction} className="profile-form">
@@ -83,33 +84,6 @@ export default async function ProfilePage({
               </FormSubmitButton>
             </div>
           </form>
-
-          <div className="panel panel-subtle">
-            <div className="stack">
-              <div>
-                <h3 className="panel-title">Test email</h3>
-                <p className="muted-copy">Posalji proveru na adresu iz `EMAIL_USER` preko Gmail App Password naloga.</p>
-              </div>
-              <TestEmailButton />
-            </div>
-          </div>
-
-          <div className="panel panel-subtle">
-            <div className="stack">
-              <div>
-                <h3 className="panel-title">Test reminder provere</h3>
-                <p className="muted-copy">
-                  Rucno pokreni proveru proizvoda koji su usli u reminder period. Ako Gmail env nije podesen ili slanje padne, poruke se zapisuju u lokalni outbox.
-                </p>
-              </div>
-              <form action={triggerReminderCheckAction}>
-                <FormSubmitButton pendingLabel="Provera..." className="button button-ghost">
-                  Pokreni proveru remindera
-                </FormSubmitButton>
-              </form>
-              <p className="muted-copy">API endpoint za daily job: <code>/api/reminders/run</code></p>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -188,15 +162,15 @@ export default async function ProfilePage({
 
       <section className="page-stack">
         <div>
-          <h2 className="panel-title">{user.isPremium ? "Dostupno u tvom paketu" : "Premium opcije"}</h2>
+          <h2 className="panel-title">{user.plan === "pro" ? "Dostupno u tvom paketu" : "Premium opcije"}</h2>
           <p className="muted-copy">
-            {user.isPremium
+            {user.plan === "pro"
               ? "Prikazane su samo funkcije koje vec postoje u interfejsu."
               : "Pro opcije su zakljucane dok premium paket nije aktivan."}
           </p>
         </div>
         <div className="compact-pro-list">
-          <LockedFeatureCard feature="smart-ocr" source="profile" isPremium={user.isPremium} />
+          <LockedFeatureCard feature="smart-ocr" source="profile" isPremium={user.plan === "pro"} />
         </div>
       </section>
 
@@ -206,7 +180,7 @@ export default async function ProfilePage({
           <p className="muted-copy">Ove premium funkcije jos nemaju pun UI tok u aplikaciji.</p>
         </div>
         <div className="compact-pro-list">
-          <LockedFeatureCard feature="cloud-backup" source="profile" isPremium={user.isPremium} />
+          <LockedFeatureCard feature="cloud-backup" source="profile" isPremium={user.plan === "pro"} />
         </div>
       </section>
     </div>

@@ -33,22 +33,29 @@ function mapItem(product: Product): ItemRecord {
   };
 }
 
-export async function getDashboardItems() {
+export async function getDashboardItems(userId: string) {
   await ensureSeedData();
 
   const products = await prisma.product.findMany({
+    where: {
+      userId
+    },
     orderBy: [{ expiryDate: "asc" }, { createdAt: "desc" }]
   });
 
   return products.map(mapItem);
 }
 
-export async function getItemById(id: string) {
+export async function getItemById(id: string, userId: string) {
   await ensureSeedData();
 
   const product = await prisma.product.findUnique({
     where: { id }
   });
 
-  return product ? mapItem(product) : null;
+  if (!product || product.userId !== userId) {
+    return null;
+  }
+
+  return mapItem(product);
 }
