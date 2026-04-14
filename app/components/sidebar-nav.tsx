@@ -42,12 +42,24 @@ const NAV_ITEMS: NavItem[] = [
   }
 ];
 
-export function SidebarNav() {
+const ADMIN_NAV_ITEM: NavItem = {
+  href: "/admin",
+  label: "Admin",
+  icon: (
+    <svg viewBox="0 0 20 20" aria-hidden="true">
+      <path d="M10 3l5.5 2v4.5c0 3.3-2.2 5.7-5.5 7.5C6.7 15.2 4.5 12.8 4.5 9.5V5L10 3Z" fill="none" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M8 9.8l1.4 1.4 2.8-3" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+};
+
+export function SidebarNav({ showAdminLink = false }: { showAdminLink?: boolean }) {
   const pathname = usePathname();
+  const items = showAdminLink ? [...NAV_ITEMS, ADMIN_NAV_ITEM] : NAV_ITEMS;
 
   return (
     <nav className="sidebar-nav" aria-label="Glavna navigacija">
-      {NAV_ITEMS.map((item) => {
+      {items.map((item) => {
         const isActive =
           item.href === "/" ? pathname === "/" : pathname === item.href || pathname.startsWith(`${item.href}/`);
 

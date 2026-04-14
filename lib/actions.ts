@@ -464,6 +464,17 @@ export async function registerLaunchInterestAction(feature: ProFeatureSlug, form
     update: {}
   });
 
+  await prisma.premiumInterest.upsert({
+    where: { email },
+    create: {
+      email,
+      source
+    },
+    update: {
+      source
+    }
+  });
+
   await trackEvent({
     name: "notify_me_click",
     feature,

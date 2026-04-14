@@ -42,6 +42,7 @@ npm.cmd run dev
 - Delete item flow
 - Locked Pro feature cards with a coming-soon page
 - Interest capture for `Notify me when Pro launches`
+- Admin login and protected `/admin` dashboard
 - Analytics-ready event hooks for `pro_click` and `notify_me_click`
 
 ## Notes for later expansion

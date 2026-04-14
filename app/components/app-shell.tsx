@@ -5,7 +5,13 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { SidebarNav } from "@/app/components/sidebar-nav";
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+export function AppShell({
+  children,
+  showAdminLink = false
+}: {
+  children: React.ReactNode;
+  showAdminLink?: boolean;
+}) {
   const pathname = usePathname();
   const isAuthPage = pathname === "/login" || pathname === "/register";
   const [theme, setTheme] = useState<"light" | "dark">("light");
@@ -73,7 +79,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </div>
             <p className="brand-subtitle">Jednostavan pregled garancija i racuna.</p>
           </div>
-          <SidebarNav />
+          <SidebarNav showAdminLink={showAdminLink} />
         </div>
       </aside>
       <main className="content-shell">

@@ -8,26 +8,26 @@ datasource db {
 }
 
 model Product {
-  id               String   @id @default(cuid())
-  userId           String?
-  name             String
-  retailer         String
-  priceCents       Int
-  priceAmount      Decimal?
-  priceCurrency    String   @default("EUR")
-  purchaseDate     DateTime
-  warrantyMonths   Int
-  expiryDate       DateTime
-  notes            String?
-  receiptImagePath String?
-  productImage     String?
-  productImageUrl  String?
-  reminderEnabled  Boolean  @default(false)
+  id                 String      @id @default(cuid())
+  userId             String?
+  name               String
+  retailer           String
+  priceCents         Int
+  priceAmount        Decimal?
+  priceCurrency      String      @default("EUR")
+  purchaseDate       DateTime
+  warrantyMonths     Int
+  expiryDate         DateTime
+  notes              String?
+  receiptImagePath   String?
+  productImage       String?
+  productImageUrl    String?
+  reminderEnabled    Boolean     @default(false)
   reminderDaysBefore Int?
   lastReminderSentAt DateTime?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-  user             UserProfile? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+  user               UserProfile? @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([expiryDate])
   @@index([createdAt])
@@ -35,20 +35,29 @@ model Product {
 }
 
 model UserProfile {
-  id                   String   @id
-  firstName            String?
-  lastName             String?
-  fullName             String
-  email                String?  @unique
-  passwordHash         String?
-  plan                 String   @default("free")
-  verified             Boolean  @default(false)
-  isPremium            Boolean  @default(false)
-  wantsEmailReminders  Boolean  @default(false)
-  lastReminderCheckAt  DateTime?
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
-  products             Product[]
+  id                  String    @id
+  firstName           String?
+  lastName            String?
+  fullName            String
+  email               String?   @unique
+  passwordHash        String?
+  plan                String    @default("free")
+  role                String    @default("user")
+  verified            Boolean   @default(false)
+  isPremium           Boolean   @default(false)
+  wantsEmailReminders Boolean   @default(false)
+  lastReminderCheckAt DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  products            Product[]
+}
+
+model PremiumInterest {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  source    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model LaunchInterest {
